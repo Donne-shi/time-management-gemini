@@ -6,9 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>时间好管家</title>
   
-  <!-- 基础库加载 -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- 核心修复：引入 Babel 用于浏览器端实时编译 TSX -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,13 +18,31 @@
     body {
       font-family: 'Noto Sans SC', sans-serif;
       background-color: var(--bg);
-      color: #1e293b;
-      -webkit-tap-highlight-color: transparent;
+      margin: 0;
       overflow-x: hidden;
     }
-    .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
-    input::placeholder { font-weight: 700; opacity: 0.4; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
+    /* 加载动画 */
+    #loader {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      z-index: 1000;
+      transition: opacity 0.5s ease;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #ff6b6b22;
+      border-top: 5px solid #ff6b6b;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loading-text { margin-top: 20px; font-weight: 900; color: #ff6b6b; letter-spacing: 2px; }
   </style>
 
   <script type="importmap">
@@ -44,31 +60,52 @@
 </script>
 </head>
 <body>
+  <div id="loader">
+    <div class="spinner"></div>
+    <div class="loading-text">引擎启动中...</div>
+  </div>
+  
   <div id="root"></div>
 
-  <!-- 使用 Babel 实时加载并处理 index.tsx -->
-  <script type="text/babel" data-type="module" data-presets="react,typescript">
-    // 这里的逻辑是为了绕过浏览器对 .tsx 文件的 MIME 检查
-    async function loadApp() {
+  <script type="text/babel" data-type="module">
+    /**
+     * 高级加载器：为了解决 GitHub Pages 无法识别 .tsx 路径的问题
+     * 我们直接从远程或本地 fetch 代码并注入运行
+     */
+    async function startApp() {
       try {
         const response = await fetch('./index.tsx');
+        if (!response.ok) throw new Error('无法获取核心脚本');
         const code = await response.text();
-        // 使用 Babel 转换代码
+        
+        // 转换代码
         const transformed = Babel.transform(code, {
-          presets: ['react', 'typescript'],
+          presets: ['react', ['typescript', { isTSX: true, allExtensions: true }]],
           filename: 'index.tsx'
         }).code;
         
-        // 执行转换后的代码
+        // 创建 Blob 并执行
+        const blob = new Blob([transformed], { type: 'application/javascript' });
+        const url = URL.createObjectURL(blob);
         const script = document.createElement('script');
         script.type = 'module';
-        script.textContent = transformed;
+        script.src = url;
+        
+        script.onload = () => {
+          const loader = document.getElementById('loader');
+          if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 500);
+          }
+        };
+        
         document.body.appendChild(script);
       } catch (err) {
-        console.error('加载应用失败:', err);
+        document.querySelector('.loading-text').innerHTML = '启动失败，请刷新页面<br><small>' + err.message + '</small>';
+        console.error('App Load Error:', err);
       }
     }
-    loadApp();
+    startApp();
   </script>
 </body>
 </html>
