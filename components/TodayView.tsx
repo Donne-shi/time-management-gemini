@@ -40,29 +40,31 @@ const TodayView: React.FC<Props> = ({ tasks, setTasks, toggleTask, deleteTask, s
     const title = bottomInput.trim();
     if (!title) return;
 
-    // 逻辑修正：检查今日的核心目标槽位 (1, 2, 3) 哪些是空的
+    // 获取今日已存在的槽位编号
     const todayTasks = tasks.filter(t => t.date === today);
     const filledSlots = todayTasks.filter(t => t.slot !== undefined).map(t => t.slot as number);
     
-    // 按顺序查找第一个空闲槽位
-    let autoAssignedSlot: number | undefined = undefined;
-    if (!filledSlots.includes(1)) autoAssignedSlot = 1;
-    else if (!filledSlots.includes(2)) autoAssignedSlot = 2;
-    else if (!filledSlots.includes(3)) autoAssignedSlot = 3;
+    // 自动寻找第一个空余的槽位
+    let assignedSlot: number | undefined = undefined;
+    for (let i = 1; i <= 3; i++) {
+      if (!filledSlots.includes(i)) {
+        assignedSlot = i;
+        break;
+      }
+    }
 
     const newTask: Task = {
       id: Date.now().toString() + Math.random(),
       title,
       completed: false,
-      isCore: autoAssignedSlot !== undefined, // 如果分配了槽位，则是核心任务
-      slot: autoAssignedSlot,
+      isCore: assignedSlot !== undefined, // 如果分配到了槽位，则是核心任务
+      slot: assignedSlot,
       date: today,
     };
 
     setTasks(prev => [...prev, newTask]);
     setBottomInput('');
     
-    // 反馈：轻微震动
     if ('vibrate' in navigator) navigator.vibrate(10);
   };
 

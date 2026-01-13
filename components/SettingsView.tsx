@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { AppState } from '../types';
-import { ChevronRight, Minus, Plus, Camera, Volume2, Moon, Bell, Check, Shield, Globe } from 'lucide-react';
+import { ChevronRight, Minus, Plus, Camera, Volume2, Moon, Bell, Check, Shield, Globe, User } from 'lucide-react';
 import { BrandLogo } from '../constants';
 
 interface Props {
@@ -87,11 +87,12 @@ const SettingsView: React.FC<Props> = ({ state, setState, user }) => {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-24">
-      <header className="px-1">
+      <header className="px-1 text-left">
         <h1 className="text-4xl font-bold tracking-tight text-slate-800 dark:text-slate-100">设置</h1>
         <p className="text-slate-400 dark:text-slate-500 font-bold mt-1">时间好管家 · 高效生活从现在开始</p>
       </header>
 
+      {/* 用户资料卡片 */}
       <div 
         onClick={() => setShowProfileModal(true)}
         className="bg-[#FF6B6B] rounded-[44px] p-8 text-white shadow-2xl shadow-red-200 dark:shadow-none cursor-pointer active:scale-[0.98] transition-all relative overflow-hidden group"
@@ -177,14 +178,14 @@ const SettingsView: React.FC<Props> = ({ state, setState, user }) => {
         />
       </section>
 
-      {/* 开发者与官网区域 */}
+      {/* 开发者与支持区域 */}
       <section className="space-y-4">
         <div className="px-1 flex items-center space-x-2">
           <Shield size={18} className="text-[#FF6B6B]" strokeWidth={3} />
           <h2 className="font-black text-slate-800 dark:text-slate-100 text-lg">关于与支持</h2>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-[44px] p-6 shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
+        <div className="bg-white dark:bg-slate-900 rounded-[44px] p-6 shadow-sm border border-slate-100 dark:border-slate-800 space-y-4 transition-colors">
           <a 
             href="https://www.mrbigtree.cn" 
             target="_blank" 
@@ -192,21 +193,23 @@ const SettingsView: React.FC<Props> = ({ state, setState, user }) => {
             className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 p-6 rounded-[32px] group active:scale-[0.98] transition-all"
           >
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 rounded-[20px] overflow-hidden border-2 border-white dark:border-slate-700 shadow-md">
+              <div className="w-16 h-16 rounded-[22px] overflow-hidden border-2 border-white dark:border-slate-700 shadow-md">
                 <img 
                   src="https://www.mrbigtree.cn/wp-content/uploads/2023/11/cropped-bigtree-avatar.jpg" 
                   alt="大树老师"
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    // 如果图片加载失败，回退到 DiceBear 风格的头像
                     (e.target as HTMLImageElement).src = "https://api.dicebear.com/7.x/avataaars/svg?seed=BigTree";
                   }}
                 />
               </div>
               <div className="text-left">
-                <p className="font-black text-slate-800 dark:text-slate-100 text-base">开发者：大树老师</p>
+                <div className="flex items-center space-x-1.5">
+                  <p className="font-black text-slate-800 dark:text-slate-100 text-base">大树老师</p>
+                  <span className="bg-red-50 dark:bg-red-900/30 text-[#FF6B6B] text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase">开发者</span>
+                </div>
                 <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold mt-1 uppercase tracking-widest flex items-center">
-                  官方网站 <Globe size={10} className="ml-1" />
+                  www.mrbigtree.cn <Globe size={10} className="ml-1" />
                 </p>
               </div>
             </div>
@@ -216,11 +219,13 @@ const SettingsView: React.FC<Props> = ({ state, setState, user }) => {
           </a>
 
           <div className="grid grid-cols-2 gap-3 px-1">
-             <button className="bg-slate-50 dark:bg-slate-800/50 py-5 rounded-[28px] text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest active:scale-95 transition-all">
-               隐私政策
+             <button className="bg-slate-50 dark:bg-slate-800/50 py-5 rounded-[28px] text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center space-x-2">
+               <Shield size={14} />
+               <span>隐私政策</span>
              </button>
-             <button className="bg-slate-50 dark:bg-slate-800/50 py-5 rounded-[28px] text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest active:scale-95 transition-all">
-               服务条款
+             <button className="bg-slate-50 dark:bg-slate-800/50 py-5 rounded-[28px] text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center space-x-2">
+               <Globe size={14} />
+               <span>官方社区</span>
              </button>
           </div>
         </div>
